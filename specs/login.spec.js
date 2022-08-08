@@ -2,24 +2,9 @@ const {browser} = require("protractor");
 const {LoginPage} = require('../page_objects/login')
 const {RegisterPage} = require("../page_objects/registration");
 
-describe('First suit', function () {
+describe('Login', function  () {
 
-    beforeEach(() => {
-        const registerPage = new RegisterPage()
-        const loginPage = new LoginPage()
-    });
-    // const registerPage = new RegisterPage()
-    // const loginPage = new LoginPage()
-
-    it('Register modal check', async  ()=> {
-
-        await browser.get('http://54.241.42.91:8080/register')
-        await registerPage.registerModalCheck()
-        await registerPage.invalidRegisterFlow()
-        await registerPage.validRegisterFlow()
-
-    });
-
+    const loginPage = new LoginPage()
 
     it('Login modal check', async  ()=> {
 
@@ -31,6 +16,7 @@ describe('First suit', function () {
         await loginPage.loginModal()
         await loginPage.invalidLoginFlow(email, password)
         await loginPage.validLoginFlow(email, password)
+
     });
 
 });

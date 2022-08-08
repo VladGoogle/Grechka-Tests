@@ -10,7 +10,7 @@ const conf = {
     },
     directConnect: true,
     SELENIUM_PROMISE_MANAGER: false,
-    restartBrowserBetweenTests: true
+    //restartBrowserBetweenTests: true
 };
 
 exports.config = conf
