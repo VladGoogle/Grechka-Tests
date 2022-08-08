@@ -12,7 +12,8 @@ const rememberText = 'Remember Me'
 const emailRequiredError = "The email field is required."
 const passwordRequiredError = "The password field is required."
 const invalidCredError = "Invalid credentials"
-const incorrectDomainError = "Your E-mail is incorrect, please use given email \"example@portion.club\""
+const incorrectDomainError = 'Your E-mail is incorrect, please use given email "example@portion.club"'
+const emailInvalidFormatError = "The email must be a valid email address."
 
 class LoginPage {
 
@@ -50,8 +51,9 @@ class LoginPage {
     async invalidLoginFlow(emailInput, passwordInput) {
 
         let randomValidDomainEmail = chance.email({domain: 'portion.club'})
+        let randomInvalidFormatValidDomainEmail = '.' + chance.email({domain: 'portion.club'})
         let randomInvalidDomainEmail = chance.email({domain: 'gmail.com'})
-
+        let randomInvalidFormatInvalidDomainEmail = '.' + chance.email({domain: 'gmail.com'})
         let randomPassword = generator.generate({
             length: 8,
             numbers: true,
@@ -61,56 +63,105 @@ class LoginPage {
 
         //Required fields check
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.emailRequiredError).expectation.expectElementToHaveText(this.loginError.emailRequiredError, emailRequiredError)
-       // await this.waiter.waitForElementToBeVisible(this.loginError.passwordRequiredError).expectation.expectElementToHaveText(this.loginError.passwordRequiredError, passwordRequiredError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, emailRequiredError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.passwordError)
+        await this.expectation.expectElementToHaveText(this.loginError.passwordError, passwordRequiredError)
         await browser.sleep(5000)
 
         await this.body.password.sendKeys(randomPassword)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementNotToBeVisible(this.loginError.passwordRequiredError)
-        //await this.waiter.waitForElementToBeVisible(this.loginError.emailRequiredError).expectation.expectElementToHaveText(this.loginError.emailRequiredError, emailRequiredError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, emailRequiredError)
+        await this.waiter.waitForElementNotToBeVisible(this.loginError.passwordError)
         await browser.sleep(5000)
 
 
         await this.body.email.sendKeys(randomValidDomainEmail)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementNotToBeVisible(this.loginError.emailRequiredError)
-        //await this.waiter.waitForElementToBeVisible(this.loginError.passwordRequiredError).expectation.expectElementToHaveText(this.loginError.passwordRequiredError, passwordRequiredError)
+        await this.expectation.expectElementToHaveText(this.loginError.passwordError, passwordRequiredError)
+        await this.waiter.waitForElementNotToBeVisible(this.loginError.emailError)
         await browser.sleep(5000)
 
 
         //Invalid credentials error check
+
+        //Incorrect email - Incorrect password
         await this.body.email.sendKeys(randomValidDomainEmail)
         await this.body.password.sendKeys(randomPassword)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError)
+        await this.expectation.expectElementToHaveText(this.loginError.invalidCredError, invalidCredError)
         await browser.sleep(5000)
 
+        //Correct email - Incorrect password
         await this.body.email.sendKeys(emailInput)
         await this.body.password.sendKeys(randomPassword)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError)
+        await this.expectation.expectElementToHaveText(this.loginError.invalidCredError, invalidCredError)
         await browser.sleep(5000)
 
+        //Incorrect email - Correct password
         await this.body.email.sendKeys(randomValidDomainEmail)
         await this.body.password.sendKeys(passwordInput)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError)
+        await this.expectation.expectElementToHaveText(this.loginError.invalidCredError, invalidCredError)
         await browser.sleep(5000)
-
 
         //Invalid domain check
         await this.body.email.sendKeys(randomInvalidDomainEmail)
         await this.body.password.sendKeys(passwordInput)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.incorrectDomainError).expectation.expectElementToHaveText(this.loginError.incorrectDomainError, incorrectDomainError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, incorrectDomainError)
+        await this.waiter.waitForElementNotToBeVisible(this.loginError.invalidCredError)
         await browser.sleep(5000)
 
         await this.body.email.sendKeys(randomInvalidDomainEmail)
         await this.body.loginButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.incorrectDomainError).expectation.expectElementToHaveText(this.loginError.incorrectDomainError, incorrectDomainError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, incorrectDomainError)
+        await this.waiter.waitForElementToBeVisible(this.loginError.passwordError)
+        await this.expectation.expectElementToHaveText(this.loginError.passwordError, passwordRequiredError)
+        await this.waiter.waitForElementNotToBeVisible(this.loginError.invalidCredError)
         await browser.sleep(5000)
 
+
+        //Invalid email format check
+
+        //Invalid format - Valid domain - Valid Password
+        await this.body.email.sendKeys(randomInvalidFormatValidDomainEmail)
+        await this.body.password.sendKeys(passwordInput)
+        await this.body.loginButton.click()
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, emailInvalidFormatError)
+        await browser.sleep(5000)
+
+        //Invalid format - Invalid domain - Invalid Password
+        await this.body.email.sendKeys(randomInvalidFormatInvalidDomainEmail)
+        await this.body.password.sendKeys(randomPassword)
+        await this.body.loginButton.click()
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, emailInvalidFormatError)
+        await browser.sleep(5000)
+
+        //Invalid format - Invalid domain - Valid Password
+        await this.body.email.sendKeys(randomInvalidFormatInvalidDomainEmail)
+        await this.body.password.sendKeys(passwordInput)
+        await this.body.loginButton.click()
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, emailInvalidFormatError)
+        await browser.sleep(5000)
+
+        //Invalid format - Valid domain - Invalid Password
+        await this.body.email.sendKeys(randomInvalidFormatValidDomainEmail)
+        await this.body.password.sendKeys(randomPassword)
+        await this.body.loginButton.click()
+        await this.waiter.waitForElementToBeVisible(this.loginError.emailError)
+        await this.expectation.expectElementToHaveText(this.loginError.emailError, emailInvalidFormatError)
+        await browser.sleep(5000)
     }
 }
 

@@ -7,15 +7,15 @@ class Waiters {
         this.expectation = new Expectations()
     }
 
-    async waitForElementToBeVisible(elem, timeout = 10000, msg) {
+    async waitForElementToBeVisible(elem, timeout = 6000, msg) {
         await browser.wait(EC.visibilityOf(elem), timeout, msg)
     }
 
-    async waitForElementNotToBeVisible(elem, timeout = 10000, msg) {
+    async waitForElementNotToBeVisible(elem, timeout = 6000, msg) {
         await browser.wait(EC.invisibilityOf(elem), timeout, msg)
     }
 
-    async waitForElementToBeVisibleAndClickable(elem, timeout = 10000, msg) {
+    async waitForElementToBeVisibleAndClickable(elem, timeout = 6000, msg) {
         await browser.wait(EC.and(EC.visibilityOf(elem), EC.elementToBeClickable(elem)), timeout, msg)
     }
 

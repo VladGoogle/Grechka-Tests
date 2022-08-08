@@ -14,11 +14,15 @@ const nameRequiredError = "The name field is required."
 const nameMinLengthError = "The name must be at least 2 characters."
 const nameMaxLengthError = "The name must not be greater than 32 characters."
 const emailRequiredError = "The email field is required."
-const emailMaxLengthError = "The email field is required."
+const emailMaxLengthError = "The email must not be greater than 32 characters."
 const emailInvalidFormatError = "The email must be a valid email address."
-const emailInvalidDomainError = "Your E-mail is incorrect, please use given email \"example@portion.club\""
+const emailInvalidDomainError = 'Your E-mail is incorrect, please use given email "example@portion.club"'
 const passwordRequiredError = "The password field is required."
-
+const passwordMinLengthError = "The password must be at least 8 characters."
+const passwordMaxLengthError = "The password must not be greater than 16 characters."
+const passwordLettersError = "The password must contain at least one uppercase and one lowercase letter."
+const passwordNumberError = "The password must contain at least one number."
+const confirmPasswordError = "The password confirmation does not match."
 
 class RegisterPage {
 
@@ -68,6 +72,9 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(confirmedPassword)
         })
 
+        // await this.waiter.waitForElementNotToBeVisible(this.registerError.nameError)
+        // await this.waiter.waitForElementNotToBeVisible(this.registerError.passwordError)
+        // await this.waiter.waitForElementNotToBeVisible(this.registerError.emailError)
 
 
         await this.registerBody.registerButton.click()
@@ -101,13 +108,16 @@ class RegisterPage {
         let randomValidName = chance.name()
         let randomMinInvalidName = chance.string({length: 1})
         let randomMaxInvalidName = chance.string({length: 33})
+        let randomMaxInvalidEmail = chance.string({length: 33, pool: 'abcde'})+'@portion.club'
+        console.log(randomMaxInvalidEmail)
         let randomValidDomainEmail = chance.email({domain: 'portion.club'})
         let randomInvalidDomainEmail = chance.email({domain: 'gmail.com'})
         let randomValidPassword = generator.generate({
-            length: 8,
+            length: 15,
             numbers: true,
-            symbols: true
+            symbols: false
         })
+        console.log(randomValidPassword)
         let validConfirmedPassword = randomValidPassword
 
         let randomMinInvalidPassword = generator.generate({
@@ -143,7 +153,7 @@ class RegisterPage {
         let randomNumInvalidPassword = generator.generate({
             length: 8,
             numbers: false,
-            symbols: true
+            symbols: false
         })
         let invalidNumConfirmedPassword = randomNumInvalidPassword
 
@@ -190,14 +200,14 @@ class RegisterPage {
         await this.expectation.expectElementToHaveText(this.registerError.emailError, emailRequiredError)
         await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
         await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordRequiredError)
-        // await this.waiter.waitForElementToBeVisible(this.loginError.passwordRequiredError).expectation.expectElementToHaveText(this.loginError.passwordRequiredError, passwordRequiredError)
         await browser.sleep(5000)
 
 
         //Invalid min length name check
         await this.registerBody.name.sendKeys(randomMinInvalidName)
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.nameError)
+        await this.expectation.expectElementToHaveText(this.registerError.nameError, nameMinLengthError)
         await browser.sleep(5000)
 
         //Invalid max length name check
@@ -205,36 +215,59 @@ class RegisterPage {
             await this.registerBody.name.sendKeys(randomMaxInvalidName)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.nameError)
+        await this.expectation.expectElementToHaveText(this.registerError.nameError, nameMaxLengthError)
         await browser.sleep(5000)
 
         //Invalid email domain check
         await this.registerBody.email.sendKeys(randomInvalidDomainEmail)
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.emailError)
+        await this.expectation.expectElementToHaveText(this.registerError.emailError, emailInvalidDomainError)
         await browser.sleep(5000)
 
-        //Invalid email format check
+        //Invalid email format check with invalid domain
         await this.registerBody.email.clear().then(async ()=>{
             await this.registerBody.email.sendKeys('.' + randomInvalidDomainEmail)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.emailError)
+        await this.expectation.expectElementToHaveText(this.registerError.emailError, emailInvalidFormatError)
         await browser.sleep(5000)
 
-        //Invalid email length check
+        //Invalid email format check with valid domain
+        await this.registerBody.email.clear().then(async ()=>{
+            await this.registerBody.email.sendKeys('.' + randomValidDomainEmail)
+        })
+        await this.registerBody.registerButton.click()
+        await this.waiter.waitForElementToBeVisible(this.registerError.emailError)
+        await this.expectation.expectElementToHaveText(this.registerError.emailError, emailInvalidFormatError)
+        await browser.sleep(5000)
+
+        //Invalid email min length check
         await this.registerBody.email.clear().then(async ()=>{
             await this.registerBody.email.sendKeys('a@portion.club')
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.emailError)
+        await this.expectation.expectElementToHaveText(this.registerError.emailError, emailInvalidDomainError)
+        await browser.sleep(5000)
+
+        //Invalid email max length check
+        await this.registerBody.email.clear().then(async ()=>{
+            await this.registerBody.email.sendKeys(randomMaxInvalidEmail)
+        })
+        await this.registerBody.registerButton.click()
+        await this.waiter.waitForElementToBeVisible(this.registerError.emailError)
+        await this.expectation.expectElementToHaveText(this.registerError.emailError, emailMaxLengthError)
         await browser.sleep(5000)
 
         //Invalid min length password check
         await this.registerBody.password.sendKeys(randomMinInvalidPassword)
         await this.registerBody.passwordConfirmation.sendKeys(invalidMinConfirmedPassword)
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordMinLengthError)
         await browser.sleep(5000)
 
         //Invalid max length password check
@@ -245,7 +278,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(invalidMaxConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordMaxLengthError)
         await browser.sleep(5000)
 
 
@@ -257,7 +291,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(invalidUpperConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordLettersError)
         await browser.sleep(5000)
 
         //Failed lower presence password check
@@ -268,7 +303,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(invalidLowerConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordLettersError)
         await browser.sleep(5000)
 
         //Failed number presence password check
@@ -279,7 +315,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(invalidNumConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordNumberError)
         await browser.sleep(5000)
 
         //Only lower letters password check
@@ -290,7 +327,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(onlyLowerLettersConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordLettersError)
         await browser.sleep(5000)
 
         //Only upper letters password check
@@ -301,7 +339,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(onlyUpperLettersConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordLettersError)
         await browser.sleep(5000)
 
         //Only numbers password check
@@ -312,7 +351,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(onlyNumbersConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordLettersError)
         await browser.sleep(5000)
 
         //Only symbols password check
@@ -323,7 +363,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(onlySymbolsConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, passwordLettersError)
         await browser.sleep(5000)
 
         //Confirm password failed check
@@ -334,7 +375,8 @@ class RegisterPage {
             await this.registerBody.passwordConfirmation.sendKeys(invalidConfirmedPassword)
         })
         await this.registerBody.registerButton.click()
-        //await this.waiter.waitForElementToBeVisible(this.loginError.invalidCredError).expectation(this.loginError.invalidCredError, invalidCredError)
+        await this.waiter.waitForElementToBeVisible(this.registerError.passwordError)
+        await this.expectation.expectElementToHaveText(this.registerError.passwordError, confirmPasswordError)
         await browser.sleep(5000)
 
     }

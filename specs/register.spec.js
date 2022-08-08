@@ -12,7 +12,6 @@ describe('Registration', function () {
         await registerPage.registerModalCheck()
         await registerPage.invalidRegisterFlow()
         await registerPage.validRegisterFlow()
-        await browser.close()
     });
 
 });

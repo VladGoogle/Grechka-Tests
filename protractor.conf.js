@@ -3,7 +3,7 @@ const conf = {
     specs: ['./specs/**/*.spec.js'],
     framework:'mocha',
     mochaOpts:{
-        timeout: 180000,
+        timeout: 240000,
     },
     onPrepare(){
         browser.waitForAngularEnabled(false)

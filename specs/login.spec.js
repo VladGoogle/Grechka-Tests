@@ -16,7 +16,6 @@ describe('Login', function  () {
         await loginPage.loginModal()
         await loginPage.invalidLoginFlow(email, password)
         await loginPage.validLoginFlow(email, password)
-
     });
 
 });
